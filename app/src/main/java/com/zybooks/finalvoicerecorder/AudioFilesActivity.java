@@ -28,9 +28,9 @@ public class AudioFilesActivity extends AppCompatActivity implements AudioFilesF
     }
 
     @Override
-    public void onFileSelected(File file) {
+    public void onFileSelected(int i) {
         Intent intent = new Intent(this, PlayAudioActivity.class);
-        intent.putExtra(PlayAudioActivity.EXTRA_FILE, file.getName());
+        intent.putExtra(PlayAudioActivity.EXTRA_FILE, i);
         startActivity(intent);
     }
 

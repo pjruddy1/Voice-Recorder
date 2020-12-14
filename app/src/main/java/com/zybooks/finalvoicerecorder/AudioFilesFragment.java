@@ -28,7 +28,7 @@ public class AudioFilesFragment extends Fragment {
     private onItemListClick mListener;
 
     public interface onItemListClick {
-        void onFileSelected(File file);
+        void onFileSelected(int i);
     }
 
     public AudioFilesFragment() {
@@ -55,8 +55,6 @@ public class AudioFilesFragment extends Fragment {
         return view;
     }
 
-
-
 //    @Override
 //    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
 //        super.onViewCreated(view, savedInstanceState);
@@ -78,6 +76,9 @@ public class AudioFilesFragment extends Fragment {
 
         private File audioFile;
         private int filePostion;
+        private String mHolder;
+
+        private Object objectHolder;
 
         private onItemListClick onItemListClick;
 
@@ -90,14 +91,15 @@ public class AudioFilesFragment extends Fragment {
         @Override
         public AudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.single_file_item, parent, false);
+            //view.setTag(mHolder);
 
-            return new AudioViewHolder(view);
+            return new AudioViewHolder(view, viewType);
         }
 
         @Override
         public void onBindViewHolder(@NonNull AudioViewHolder holder, int position) {
             holder.file_title.setText(allFiles[position].getName());
-            holder.file_title.setTag(String.valueOf(position));
+            holder.file_title.setTag(position);
         }
 
         @Override
@@ -105,18 +107,17 @@ public class AudioFilesFragment extends Fragment {
             return allFiles.length;
         }
 
-
-
-
         public class AudioViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
             private ImageView file_image;
             private TextView file_title;
 
-            public AudioViewHolder(@NonNull View itemView) {
+            public AudioViewHolder(@NonNull View itemView, int i) {
                 super(itemView);
                 itemView.setOnClickListener(this);
-                itemView.setTag(allFiles[filePostion]);
+                //mHolder = allFiles[i].getName();
+                itemView.setTag(i);
+                objectHolder = itemView.getTag();
                 file_image = itemView.findViewById(R.id.file_image_view);
                 file_title = itemView.findViewById(R.id.file_title);
 
@@ -124,12 +125,7 @@ public class AudioFilesFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                for (int i = 0; i < allFiles.length; i ++){
-                    int holder = (int) v.getTag();
-                    if (holder == i){
-                        mListener.onFileSelected(allFiles[i]);
-                    }
-                }
+                mListener.onFileSelected((int) v.findViewById(R.id.file_title).getTag());
             }
         }
 
@@ -142,7 +138,7 @@ public class AudioFilesFragment extends Fragment {
             mListener = (onItemListClick) context;
         } else {
             throw new RuntimeException(context.toString()
-                    + " must implement OnBandSelectedListener");
+                    + "");
         }
     }
 
@@ -151,7 +147,5 @@ public class AudioFilesFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
-
-
 
 }

@@ -3,9 +3,15 @@ package com.zybooks.finalvoicerecorder;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -15,7 +21,7 @@ import java.io.IOException;
 
 public class PlayAudioActivity extends AppCompatActivity {
 
-    public static String EXTRA_FILE = null;
+    public static String EXTRA_FILE = "1";
     private File[] allFiles;
     private File audioFile = null;
     private TextView fileNameText;
@@ -25,26 +31,30 @@ public class PlayAudioActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ImageButton playButton;
     private boolean isPlaying = false;
+    private int mCurrentFile = 0;
+    private EditText mRenameFile;
+    private Button mRenameButton;
+    private MediaRecorder mediaRecorder;
+    String path = getExternalFilesDir("/").getAbsolutePath();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_audio);
 
-        String path = getExternalFilesDir("/").getAbsolutePath();
         File directory = new File(path);
         allFiles = directory.listFiles();
 
-        for (File file: allFiles){
-            if (file.getName() == EXTRA_FILE){
-                audioFile = file;
-            }
-        }
+        int holder = getIntent().getIntExtra(EXTRA_FILE, 1);
+        mCurrentFile = holder;
+
+        audioFile = allFiles[holder];
 
         playButton = findViewById(R.id.playButton);
         fileNameText = findViewById(R.id.fileName);
         playerSeekbar = findViewById(R.id.playerSeekbar);
         fileNameText.setText(audioFile.getName());
+
 
         playerSeekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -67,14 +77,82 @@ public class PlayAudioActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        // Inflate menu for the app bar
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.record_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Determine which app bar item was chosen
+        switch (item.getItemId()) {
+
+            case R.id.delete:
+                DeleteFile();
+                return true;
+
+            case R.id.rename:
+
+                RenameFile();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void DeleteFile() {
+    }
+
+    private void RenameFile() {
+        mRenameFile = findViewById(R.id.renameText);
+        mRenameButton = findViewById(R.id.renameButton);
+        mRenameButton.setVisibility(View.VISIBLE);
+        mRenameFile.setVisibility(View.VISIBLE);
+    }
+
     public void playClick(View view) {
         playAudio(audioFile);
     }
 
     public void prevClick(View view) {
+        if ((mCurrentFile - 1) < 0 ){
+            mCurrentFile = allFiles.length - 1;
+            fileNameText.setText(getFileName(mCurrentFile));
+            setFile(mCurrentFile);
+        }
+        else{
+            mCurrentFile --;
+            fileNameText.setText(getFileName(mCurrentFile));
+            setFile(mCurrentFile);
+        }
     }
 
     public void nextClick(View view) {
+        if ((mCurrentFile + 1) == allFiles.length){
+            mCurrentFile = 0;
+            fileNameText.setText(getFileName(mCurrentFile));
+            setFile(mCurrentFile);
+        }
+        else{
+            mCurrentFile ++;
+            fileNameText.setText(getFileName(mCurrentFile));
+            setFile(mCurrentFile);
+        }
+    }
+
+    public void setFile(int i){
+        audioFile = allFiles[i];
+    }
+
+    public String getFileName(int i){
+
+        return allFiles[i].getName();
     }
 
     private void playAudio(File file) {
@@ -137,5 +215,36 @@ public class PlayAudioActivity extends AppCompatActivity {
                 seekbarHandler.postDelayed(this, 500);
             }
         };
+    }
+
+    public void renameClick(View view) {
+        String holder = audioFile.getName();
+        int fileSpot = 0;
+        if (mRenameFile.getText() != null && String.valueOf(mRenameFile.getText()) != ""){
+            String newFileName = mRenameFile.getText() + ".3gp";
+
+            audioFile.delete();
+
+            //Get app external directory path
+            String recordPath = getExternalFilesDir("/").getAbsolutePath();
+
+            mediaRecorder.setOutputFile(recordPath + "/" + newFileName);
+
+            File directory = new File(path);
+            allFiles = directory.listFiles();
+
+            for (int i = 0; i < allFiles.length; i++){
+                if(allFiles[i].getName() == newFileName){
+                    fileSpot = i;
+                }
+            }
+
+            fileNameText.setText(allFiles[fileSpot].getName());
+            audioFile = allFiles[fileSpot];
+
+            mRenameFile.setVisibility(View.INVISIBLE);
+            mRenameButton.setVisibility(View.INVISIBLE);
+
+        }
     }
 }
