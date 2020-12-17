@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".RecordFragment">
+    tools:context=".RecordFragment"
+    android:background="@color/lightBlue">
 
     <ImageView
         android:id="@+id/imageView"
@@ -17,6 +18,7 @@
         android:layout_marginEnd="49dp"
         android:layout_marginBottom="26dp"
         android:src="@drawable/note"
+        android:background="@drawable/outline"
         app:layout_constraintBottom_toTopOf="@+id/record_filename"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -42,6 +44,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="45dp"
         android:textSize="64sp"
+        android:background="@drawable/outline"
         app:layout_constraintBottom_toTopOf="@+id/micButton"
         app:layout_constraintEnd_toEndOf="@+id/micButton"
         app:layout_constraintTop_toBottomOf="@+id/record_filename" />
@@ -51,7 +54,7 @@
         android:layout_width="193dp"
         android:layout_height="0dp"
         android:layout_marginBottom="91dp"
-        android:background="#ffffff"
+        android:background="@color/lightBlue"
         android:src="@drawable/mic_red"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

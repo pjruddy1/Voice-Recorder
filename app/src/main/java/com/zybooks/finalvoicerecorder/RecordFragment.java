@@ -27,17 +27,17 @@ import java.util.Locale;
 
 public class RecordFragment extends Fragment implements View.OnClickListener {
 
+    //  Some of this code was sourced from:
+    // TVAC Studio
+    // https://www.youtube.com/watch?v=PhQwbJ-1iNs
+
     private ImageButton recordBtn;
     private TextView filenameText;
-
     private boolean isRecording = false;
-
     private String recordPermission = Manifest.permission.RECORD_AUDIO;
     private int PERMISSION_CODE = 21;
-
     private MediaRecorder mediaRecorder;
     private String recordFile;
-
     private Chronometer timer;
 
     public RecordFragment() {
@@ -58,28 +58,22 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         timer = view.findViewById(R.id.record_timer);
         filenameText = view.findViewById(R.id.record_filename);
 
-        /* Setting up on click listener
-           - Class must implement 'View.OnClickListener' and override 'onClick' method
-         */
         recordBtn.setOnClickListener(this);
     }
 
     @Override
     public void onClick(View v) {
        if(isRecording) {
-            //Stop Recording
             stopRecording();
 
-            // Change button image and set Recording state to false
             recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.mic_red, null));
             isRecording = false;
        } else {
           //Check permission to record audio
            if(checkPermissions()) {
-                //Start Recording
+
                 startRecording();
 
-                // Change button image and set Recording state to false
                 recordBtn.setImageDrawable(getResources().getDrawable(R.drawable.mic_green, null));
                 isRecording = true;
            }
@@ -89,9 +83,9 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
 
     private void stopRecording() {
         timer.stop();
-        //Change text on page
+
         filenameText.setText("Recording Stopped, File Saved : " + recordFile);
-        //Stop media recorder and set it to null for further use to record new audio
+
         mediaRecorder.stop();
         mediaRecorder.release();
         mediaRecorder = null;
@@ -113,6 +107,8 @@ public class RecordFragment extends Fragment implements View.OnClickListener {
         recordFile = "Recording_" + formatter.format(now) + ".3gp";
 
         filenameText.setText("Recording, File Name : " + recordFile);
+
+        String path = recordPath + "/" + recordFile;
 
         //Setup Media Recorder for recording
         mediaRecorder = new MediaRecorder();

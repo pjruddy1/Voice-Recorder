@@ -10,6 +10,12 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+// Patrick Ruddy
+// 12/16/2020
+// ISYS 221
+
+
+
 public class RecordActivity extends AppCompatActivity {
 
     @Override

@@ -3,6 +3,8 @@
     package="com.zybooks.finalvoicerecorder">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -10,9 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".PlayAudioActivity"></activity>
-        <activity android:name=".AudioFilesActivity" />
+        android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
+        <activity android:name=".PlayAudioActivity"
+            android:parentActivityName=".AudioFilesActivity"></activity>
+        <activity android:name=".AudioFilesActivity"
+            android:parentActivityName=".RecordActivity"/>
         <activity android:name=".RecordActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

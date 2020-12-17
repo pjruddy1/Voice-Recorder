@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.os.Bundle;
+import android.os.FileUtils;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,6 +19,9 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class PlayAudioActivity extends AppCompatActivity {
 
@@ -35,13 +39,14 @@ public class PlayAudioActivity extends AppCompatActivity {
     private EditText mRenameFile;
     private Button mRenameButton;
     private MediaRecorder mediaRecorder;
-    String path = getExternalFilesDir("/").getAbsolutePath();
+    private String path;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_play_audio);
 
+        path = getExternalFilesDir("/").getAbsolutePath();
         File directory = new File(path);
         allFiles = directory.listFiles();
 
@@ -82,7 +87,7 @@ public class PlayAudioActivity extends AppCompatActivity {
 
         // Inflate menu for the app bar
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.record_menu, menu);
+        inflater.inflate(R.menu.play_audio_menu, menu);
         return true;
     }
 
@@ -97,7 +102,6 @@ public class PlayAudioActivity extends AppCompatActivity {
                 return true;
 
             case R.id.rename:
-
                 RenameFile();
                 return true;
 
@@ -107,6 +111,17 @@ public class PlayAudioActivity extends AppCompatActivity {
     }
 
     private void DeleteFile() {
+        List<File> fileList = new ArrayList<>(Arrays.asList(allFiles));
+        fileList.remove(mCurrentFile);
+        audioFile.delete();
+        mCurrentFile --;
+        allFiles = fileList.toArray(new File[allFiles.length -1]);
+        updateFileInfo();
+    }
+
+    private void updateFileInfo() {
+        fileNameText.setText(allFiles[mCurrentFile].getName());
+        audioFile = allFiles[mCurrentFile];
     }
 
     private void RenameFile() {
@@ -121,6 +136,9 @@ public class PlayAudioActivity extends AppCompatActivity {
     }
 
     public void prevClick(View view) {
+        if (isPlaying == true){
+            stopAudio();
+        }
         if ((mCurrentFile - 1) < 0 ){
             mCurrentFile = allFiles.length - 1;
             fileNameText.setText(getFileName(mCurrentFile));
@@ -183,9 +201,9 @@ public class PlayAudioActivity extends AppCompatActivity {
 
     private void stopAudio() {
         //Stop The Audio
-        playButton.setImageDrawable(getResources().getDrawable(R.drawable.play, null));
-        isPlaying = false;
         mediaPlayer.stop();
+        isPlaying = false;
+        playButton.setImageDrawable(getResources().getDrawable(R.drawable.play, null));
         seekbarHandler.removeCallbacks(updateSeekbar);
 
     }
@@ -218,33 +236,37 @@ public class PlayAudioActivity extends AppCompatActivity {
     }
 
     public void renameClick(View view) {
-        String holder = audioFile.getName();
-        int fileSpot = 0;
+
+        audioFile.setReadable(true);
+        audioFile.setWritable(true);
+
         if (mRenameFile.getText() != null && String.valueOf(mRenameFile.getText()) != ""){
+            String recordPath = getExternalFilesDir("/").getAbsolutePath();
             String newFileName = mRenameFile.getText() + ".3gp";
 
-            audioFile.delete();
+            String path = recordPath + "/" + newFileName;
+            File newFile = new File(recordPath + "/" + newFileName);
+            newFile.setWritable(true);
+            newFile.setReadable(true);
 
-            //Get app external directory path
-            String recordPath = getExternalFilesDir("/").getAbsolutePath();
+            if(audioFile.renameTo(newFile)){
 
-            mediaRecorder.setOutputFile(recordPath + "/" + newFileName);
+                path = getExternalFilesDir("/").getAbsolutePath();
+                File directory = new File(path);
+                allFiles = directory.listFiles();
+                audioFile = allFiles[mCurrentFile];
 
-            File directory = new File(path);
-            allFiles = directory.listFiles();
+                fileNameText.setText(audioFile.getName());
 
-            for (int i = 0; i < allFiles.length; i++){
-                if(allFiles[i].getName() == newFileName){
-                    fileSpot = i;
-                }
+                mRenameFile.setVisibility(View.INVISIBLE);
+                mRenameButton.setVisibility(View.INVISIBLE);
             }
-
-            fileNameText.setText(allFiles[fileSpot].getName());
-            audioFile = allFiles[fileSpot];
-
-            mRenameFile.setVisibility(View.INVISIBLE);
-            mRenameButton.setVisibility(View.INVISIBLE);
-
+            else{
+                mRenameFile.setText("Error Changing File Name");
+            }
+        }
+        else{
+            mRenameFile.setText("Error Changing File Name");
         }
     }
 }

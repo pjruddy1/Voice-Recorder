@@ -20,6 +20,10 @@ import android.widget.TextView;
 import java.io.File;
 import java.util.List;
 
+//  Some of this code was sourced from:
+// TVAC Studio
+// https://www.youtube.com/watch?v=PhQwbJ-1iNs
+
 public class AudioFilesFragment extends Fragment {
 
     private File[] allFiles;
